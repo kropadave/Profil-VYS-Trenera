@@ -115,6 +115,7 @@ async function loadVyplaty() {
   `;
 }
 
+
 // ------------------ HISTORIE VÝPLAT ------------------
 async function loadHistorieVyplat() {
   const data = await fetchSheet(SHEETS.ZAZNAMY_VYPLAT);
@@ -140,4 +141,3 @@ loadDochazka();
 loadVyplaty();
 loadHistorieVyplat();
 showTab("treningy");
-
