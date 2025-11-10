@@ -19,6 +19,40 @@ h2, h3 {
     letter-spacing: 0.5px;
 }
 
+/* Přihlašovací stránka - nadpis */
+body > h2 {
+    margin-top: 32px;
+    margin-bottom: 32px;
+    text-align: center;
+    font-size: 2.5rem;
+    font-weight: 900;
+    letter-spacing: 2px;
+    background: linear-gradient(90deg, #644fff 30%, #8e6fff 70%);
+    color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+    text-shadow: 0 4px 18px rgba(100,81,255,0.13);
+    text-transform: uppercase;
+    line-height: 1.1;
+    border-radius: 0;
+}
+@media (max-width: 700px) {
+    body > h2 {
+        font-size: 1.6rem;
+        margin-top: 18px;
+        margin-bottom: 22px;
+        letter-spacing: 1px;
+    }
+}
+@media (max-width: 500px) {
+    body > h2 {
+        font-size: 1.1rem;
+        margin-top: 10px;
+        margin-bottom: 14px;
+        letter-spacing: 0.5px;
+    }
+}
+
 /* ------------------------------------
    NADPISY NAD TABULKOU
 ------------------------------------ */
@@ -176,14 +210,16 @@ td.amount, .amount {
    LOGIN BOX / FORMS (IF NEEDED)
 ------------------------------------ */
 .login-box {
-    background: #ffffff;
-    padding: 48px 38px;
-    border-radius: 20px;
+    background: #fff;
+    padding: 44px 28px 36px 28px;
+    border-radius: 22px;
     box-shadow: 0 10px 25px rgba(100, 81, 255, 0.15);
     display: inline-block;
     text-align: center;
     transition: transform 0.3s, box-shadow 0.3s;
-    margin: 32px 0;
+    margin: 0 0 36px 0;
+    min-width: 320px;
+    max-width: 98vw;
 }
 .login-box:hover {
     transform: translateY(-4px) scale(1.01);
@@ -340,7 +376,8 @@ button:hover {
         min-width: 70px;
     }
     .login-box {
-        padding: 16px 2px;
+        padding: 10px 2vw 8px 2vw;
+        margin: 0 0 8px 0;
     }
     input {
         font-size: 14px;
@@ -358,3 +395,4 @@ button:hover {
         padding: 8px 4px;
     }
 }
+
