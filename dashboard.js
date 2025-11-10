@@ -74,7 +74,8 @@ async function loadDochazka() {
   `;
 }
 
-// ------------------ VÝPLATY BEZ ŠIPEK ------------------
+// ------------------ VÝPLATY ------------------
+
 async function loadVyplaty() {
   const key = await getTrainerKey();
   if (!key) {
@@ -83,15 +84,19 @@ async function loadVyplaty() {
   }
 
   const data = await fetchSheet(SHEETS.VYPLATY);
-  const rows = data.slice(2); // od 3. řádku
+
+  // ✅ měsíc je v B1
+  const month = data[0][1] || "Neznámý měsíc";
+
+  const rows = data.slice(2); 
   const myPayments = rows.filter(r => r[0] === key);
 
   let html = `<tr><td colspan="3">Žádné výplaty k zobrazení</td></tr>`;
+
   if (myPayments.length > 0) {
     html = myPayments.map(r => {
-      const month = r[1] || "Neznámý měsíc"; // sloupec B = měsíc
-      const count = r[2] || 0;               // sloupec C = počet tréninků
-      const amount = r[3] || count * 400;    // sloupec D = částka, pokud chybí, spočítat ×400
+      const count = r[2] || 0;               
+      const amount = r[3] || count * 400;    
 
       return `<tr>
         <td>${month}</td>
@@ -135,3 +140,4 @@ loadDochazka();
 loadVyplaty();
 loadHistorieVyplat();
 showTab("treningy");
+
