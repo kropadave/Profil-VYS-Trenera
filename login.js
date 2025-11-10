@@ -4,6 +4,13 @@ async function login() {
   const errorEl = document.getElementById("error");
 
   errorEl.textContent = "";
+  errorEl.classList.remove("login-error");
+
+  if (!/^\d{6}$/.test(password)) {
+    errorEl.textContent = "Heslo musí být přesně 6 číslic.";
+    errorEl.classList.add("login-error");
+    return;
+  }
 
   try {
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEETS.MAPA_JMEN}?key=${API_KEY}`;
@@ -18,9 +25,11 @@ async function login() {
       window.location.href = "dashboard.html";
     } else {
       errorEl.textContent = "Nesprávné jméno nebo heslo.";
+      errorEl.classList.add("login-error");
     }
   } catch (err) {
     console.error(err);
     errorEl.textContent = "Chyba při přihlášení.";
+    errorEl.classList.add("login-error");
   }
 }
