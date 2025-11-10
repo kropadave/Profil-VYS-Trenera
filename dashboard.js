@@ -1,7 +1,15 @@
 const user = localStorage.getItem("user");
 if (!user) window.location.href = "index.html";
 
-document.getElementById("welcome").textContent = `Vítej, ${user}!`;
+// Profesionální uvítání
+const welcomeEl = document.getElementById("welcome");
+welcomeEl.innerHTML = `
+  <div style="margin-top:36px;margin-bottom:10px;">
+    <span style="font-size:2.1rem;font-weight:800;color:#644fff;letter-spacing:1px;">Docházka trenérů</span>
+  </div>
+  <div style="font-size:1.15rem;font-weight:500;color:#333;margin-bottom:4px;">Vítejte v aplikaci pro správu docházky a výplat</div>
+  <div style="font-size:1rem;font-weight:400;color:#666;">Přihlášený uživatel: <b style='color:#1fa463;'>${user}</b></div>
+`;
 
 // ------------------ FUNKCE PRO TABS ------------------
 function showTab(tab) {
@@ -11,8 +19,10 @@ function showTab(tab) {
 
 // ------------------ LOGOUT ------------------
 function logout() {
-  localStorage.removeItem("user");
-  window.location.href = "index.html";
+  if (confirm("Opravdu se chcete odhlásit?")) {
+    localStorage.removeItem("user");
+    window.location.href = "index.html";
+  }
 }
 
 // ------------------ FETCH DAT ZE SHEETU ------------------
@@ -39,10 +49,20 @@ async function loadTreningy() {
 
   if (record) {
     document.getElementById("treningy").innerHTML = `
-      <h3>Pravidelné tréninky:</h3>
-      <p>${record[5] || "—"}</p>
-      <h3>Zástupné tréninky:</h3>
-      <p>${record[6] || "—"}</p>
+      <div style="padding:24px 0 8px 0;">
+        <h3 style="font-size:1.4em;color:#644fff;display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+          <span>🏋️</span> Pravidelné tréninky
+        </h3>
+        <div style="font-size:1.1em;padding:10px 18px;background:#f7f5fb;border-radius:12px;margin-bottom:18px;min-height:32px;">
+          ${record[5] || "<span style='color:#aaa;'>Žádné pravidelné tréninky</span>"}
+        </div>
+        <h3 style="font-size:1.2em;color:#644fff;display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+          <span>🔄</span> Zástupné tréninky
+        </h3>
+        <div style="font-size:1.1em;padding:10px 18px;background:#f7f5fb;border-radius:12px;min-height:32px;">
+          ${record[6] || "<span style='color:#aaa;'>Žádné zástupné tréninky</span>"}
+        </div>
+      </div>
     `;
   } else {
     document.getElementById("treningy").innerHTML = `<p>Žádné tréninky k zobrazení.</p>`;
@@ -101,7 +121,7 @@ async function loadVyplaty() {
       return `<tr>
         <td>${month}</td>
         <td>${count}</td>
-        <td>${amount}</td>
+        <td class="amount">${amount}</td>
       </tr>`;
     }).join("");
   }
@@ -115,7 +135,6 @@ async function loadVyplaty() {
   `;
 }
 
-
 // ------------------ HISTORIE VÝPLAT ------------------
 async function loadHistorieVyplat() {
   const data = await fetchSheet(SHEETS.ZAZNAMY_VYPLAT);
@@ -123,7 +142,10 @@ async function loadHistorieVyplat() {
 
   let html = `<tr><td colspan="3">Žádné záznamy</td></tr>`;
   if (rows.length > 0) {
-    html = rows.map(r => `<tr><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`).join("");
+    html = rows.map(r => {
+      const paid = r[2] === 'TRUE' ? "<span style='font-size:1.3em;'>✅</span>" : r[2];
+      return `<tr><td>${r[1]}</td><td>${paid}</td><td class='amount'>${r[3]}</td></tr>`;
+    }).join("");
   }
 
   document.getElementById("historie").innerHTML = `
