@@ -10,12 +10,27 @@
   <h2>Přihlášení</h2>
   <div class="login-box">
     <input type="text" id="username" placeholder="Jméno"><br>
-    <input type="password" id="password" placeholder="Heslo"><br>
+    <div style="position:relative;max-width:340px;margin:0 auto;display:flex;align-items:center;">
+      <input type="tel" id="password" placeholder="Heslo" maxlength="6" pattern="\d{6}" inputmode="numeric" style="width:100%;padding-right:36px;" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,6)">
+      <button type="button" id="togglePassword" style="position:absolute;right:0;top:50%;transform:translateY(-130%);height:auto;display:flex;align-items:center;justify-content:center;padding:0 4px;font-size:1.3em;background:transparent;border:none;box-shadow:none;outline:none;color:#644fff;cursor:pointer;line-height:1;">👁️</button>
+    </div>
     <button onclick="login()">Přihlásit se</button>
-    <p id="error" class="error"></p>
+    <p id="error" class="login-error"></p>
   </div>
 
   <script src="config.js"></script>
   <script src="login.js"></script>
+  <script>
+    document.getElementById('togglePassword').onclick = function() {
+      const pwd = document.getElementById('password');
+      if (pwd.type === 'password') {
+        pwd.type = 'text';
+        this.textContent = '🙈';
+      } else {
+        pwd.type = 'password';
+        this.textContent = '👁️';
+      }
+    };
+  </script>
 </body>
 </html>
