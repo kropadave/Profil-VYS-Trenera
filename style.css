@@ -263,11 +263,14 @@ button:hover {
         font-size: 15px;
     }
     h2, h3 {
+        margin-top: 18px;
         margin-bottom: 18px;
+        text-align: center;
     }
     .table-title, .table-subtitle {
         font-size: 18px;
-        margin: 18px 0 18px 0;
+        margin: 24px 0 18px 0;
+        text-align: center;
     }
     .tab {
         width: 100%;
@@ -314,11 +317,14 @@ button:hover {
 }
 @media (max-width: 500px) {
     h2, h3 {
+        margin-top: 14px;
         margin-bottom: 14px;
+        text-align: center;
     }
     .table-title, .table-subtitle {
         font-size: 16px;
-        margin: 12px 0 14px 0;
+        margin: 18px 0 14px 0;
+        text-align: center;
     }
     .tab {
         padding: 0 1vw 12px 1vw;
