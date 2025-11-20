@@ -1,86 +1,120 @@
+/* 
+   LOGIN.JS - Opravená verze
+   Logika: Původní (Google Sheets API)
+   Vzhled: Nový (Glassmorphism)
+*/
+
 document.addEventListener("DOMContentLoaded", () => {
     const loginBtn = document.getElementById("login-btn");
     const usernameInput = document.getElementById("username");
     const passwordInput = document.getElementById("password");
-    const errorMsg = document.getElementById("error-msg");
+    const errorMsg = document.getElementById("error-msg"); // V novém HTML se to jmenuje error-msg
 
-    // Funkce pro přihlášení
-    async function handleLogin() {
+    // Event Listenery pro kliknutí a Enter
+    loginBtn.addEventListener("click", login);
+    
+    passwordInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") login();
+    });
+    usernameInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+             if(passwordInput.value === "") passwordInput.focus();
+             else login();
+        }
+    });
+
+    async function login() {
         const username = usernameInput.value.trim();
         const password = passwordInput.value.trim();
+        
+        // Reset chyb a stylování
+        errorMsg.textContent = "";
+        errorMsg.style.color = "var(--danger)";
+        
+        // Indikace načítání na tlačítku
+        const originalBtnContent = loginBtn.innerHTML;
+        loginBtn.innerHTML = 'Načítám...';
+        loginBtn.style.opacity = "0.7";
+        loginBtn.disabled = true;
 
-        errorMsg.textContent = ""; // Vymazat předchozí chyby
-        loginBtn.innerHTML = '<div class="loader"></div> Načítám...'; // Indikace načítání (pokud máte CSS pro loader)
-
-        if (!username || !password) {
-            errorMsg.textContent = "Vyplňte prosím obě pole.";
-            resetButton();
+        // 1. Validace hesla (musí být 6 číslic, jak bylo ve vašem originálním kódu)
+        if (!/^\d{6}$/.test(password)) {
+            showError("Heslo musí být přesně 6 číslic.");
+            resetButton(originalBtnContent);
             return;
         }
 
         try {
-            // Načtení databáze uživatelů
-            // Používáme CONFIG.API_URL z config.js
-            const response = await fetch(CONFIG.API_URL);
+            // Používáme proměnné z config.js (SHEET_ID, SHEETS, API_KEY)
+            // Ujistěte se, že config.js je správně načtený v index.html
+            const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEETS.MAPA_JMEN}?key=${API_KEY}`;
             
-            if (!response.ok) {
-                throw new Error(`Chyba sítě: ${response.status}`);
+            const res = await fetch(url);
+            
+            if (!res.ok) {
+                throw new Error(`Chyba API: ${res.status}`);
             }
 
-            const data = await response.json();
+            const data = await res.json();
             
-            // Hledání uživatele v datech
-            // Předpokládáme strukturu: { "users": [ { "username": "...", "password": "...", "role": "..." } ] }
-            // NEBO pokud je meta.json přímo pole uživatelů, upravíme logiku níže.
-            
-            let user = null;
+            if (!data.values) {
+                throw new Error("Žádná data v tabulce.");
+            }
 
-            // Varianta 1: meta.json obsahuje objekt s klíčem "users"
-            if (data.users && Array.isArray(data.users)) {
-                user = data.users.find(u => u.username === username && u.password === password);
-            } 
-            // Varianta 2: meta.json je přímo pole objektů
-            else if (Array.isArray(data)) {
-                user = data.find(u => u.username === username && u.password === password);
-            }
-            // Varianta 3: Specifická struktura pro váš projekt?
-            else {
-                console.error("Neznámá struktura JSON dat:", data);
-            }
+            // Slice(1) přeskočí hlavičku tabulky
+            const rows = data.values.slice(1);
+
+            // Hledání uživatele: Sloupec B (index 1) = jméno, Sloupec D (index 3) = heslo
+            const user = rows.find(r => r[1] === username && r[3] === password); 
 
             if (user) {
-                // Úspěšné přihlášení
-                localStorage.setItem("token", "logged_in"); // Jednoduchý token
-                localStorage.setItem("currentUser", JSON.stringify(user));
-                
-                loginBtn.innerHTML = '<span>Úspěch!</span>';
+                // Úspěch!
+                loginBtn.innerHTML = 'Úspěch!';
                 loginBtn.style.background = 'var(--success)';
                 
+                // Uložení do localStorage
+                localStorage.setItem("user", username);
+                
+                // Přesměrování
                 setTimeout(() => {
                     window.location.href = "dashboard.html";
                 }, 500);
             } else {
-                errorMsg.textContent = "Špatné jméno nebo heslo.";
-                resetButton();
+                showError("Nesprávné jméno nebo heslo.");
+                resetButton(originalBtnContent);
             }
 
-        } catch (error) {
-            console.error("Chyba přihlášení:", error);
-            errorMsg.textContent = "Chyba připojení k databázi (meta.json nenalezen).";
-            resetButton();
+        } catch (err) {
+            console.error(err);
+            showError("Chyba při přihlášení (zkontrolujte konzoli).");
+            resetButton(originalBtnContent);
         }
     }
 
-    function resetButton() {
-        loginBtn.innerHTML = '<span>Vstoupit do systému</span><div class="arrow">→</div>';
-        loginBtn.style.background = ''; // Reset barvy
+    function showError(text) {
+        errorMsg.textContent = text;
+        // Jemná animace zatřesení pro chybu
+        const wrapper = document.querySelector('.login-wrapper');
+        wrapper.style.animation = 'none';
+        wrapper.offsetHeight; /* trigger reflow */
+        wrapper.style.animation = 'shake 0.4s ease-in-out';
     }
 
-    // Event listenery
-    loginBtn.addEventListener("click", handleLogin);
-
-    // Odeslání Enterem
-    passwordInput.addEventListener("keypress", (e) => {
-        if (e.key === "Enter") handleLogin();
-    });
+    function resetButton(originalContent) {
+        loginBtn.innerHTML = originalContent;
+        loginBtn.style.opacity = "1";
+        loginBtn.disabled = false;
+        loginBtn.style.background = ""; // Reset barvy
+    }
 });
+
+// Přidejte tuto malou animaci do CSS nebo sem dynamicky
+const style = document.createElement('style');
+style.innerHTML = `
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-10px); }
+  75% { transform: translateX(10px); }
+}
+`;
+document.head.appendChild(style);
