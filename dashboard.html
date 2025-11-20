@@ -1,38 +1,51 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard | Přehled</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
+  <!-- Uvítací text (plněno přes JS) -->
+  <div id="welcome" style="margin-top: 30px; text-align: center;"></div>
 
-    <header>
-        <div class="logo">Admin<span>Portál</span></div>
-        <!-- ID logout-btn zachováno pro funkčnost -->
-        <button id="logout-btn" class="logout-icon" title="Odhlásit">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                <polyline points="16 17 21 12 16 7"></polyline>
-                <line x1="21" y1="12" x2="9" y2="12"></line>
-            </svg>
-        </button>
-    </header>
+  <!-- Navigace - pilulky -->
+  <nav>
+    <button onclick="showTab('treningy')">Tréninky</button>
+    <button onclick="showTab('dochazka')">Docházka</button>
+    <button onclick="showTab('vyplaty')">Výplaty</button>
+    <button onclick="showTab('historie')">Historie</button>
+    <button class="logout" onclick="logout()">Odhlásit</button>
+  </nav>
 
-    <!-- ID navigation zachováno -->
-    <nav id="navigation">
-        <!-- Váš JS sem vloží tlačítka -->
-    </nav>
+  <div id="content">
 
-    <!-- ID content zachováno -->
-    <main id="content">
-        <!-- Váš JS sem vloží tabulky -->
-    </main>
+    <!-- TRÉNINKY -->
+    <section id="treningy" class="tab" style="display:block;">
+        <!-- Obsah se načte přes JS -->
+    </section>
 
-    <!-- Načítáme vaše původní skripty -->
-    <script src="config.js"></script>
-    <script src="dashboard.js"></script>
+    <!-- DOCHÁZKA -->
+    <section id="dochazka" class="tab">
+        <!-- Obsah se načte přes JS -->
+    </section>
+
+    <!-- VÝPLATY -->
+    <section id="vyplaty" class="tab">
+      <!-- Obsah se načte přes JS -->
+      <div id="vyplatyContent"></div>
+    </section>
+
+    <!-- HISTORIE VÝPLAT -->
+    <section id="historie" class="tab">
+        <!-- Obsah se načte přes JS -->
+    </section>
+
+  </div>
+
+  <script src="config.js"></script>
+  <script src="dashboard.js"></script>
 </body>
 </html>
