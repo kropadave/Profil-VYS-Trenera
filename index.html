@@ -3,38 +3,46 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Přihlášení | Portál</title>
+  <title>Přihlášení - Docházka Trenérů</title>
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
-  
-  <div class="login-container">
-      <h2>Admin Portál</h2>
-      
-      <div class="login-box">
-        <!-- Input pro jméno -->
-        <input type="text" id="username" placeholder="Jméno uživatele" autocomplete="off">
-        
-        <!-- Input pro heslo s ikonou oka -->
-        <div style="position:relative; width:100%;">
-          <input type="password" id="password" placeholder="PIN kód (6 číslic)" maxlength="6" inputmode="numeric" pattern="\d*">
-          <button type="button" id="togglePassword" style="position:absolute; right:10px; top:12px; width:auto; height:auto; background:transparent; border:none; color:var(--text-secondary); font-size:1.2rem; padding:0; margin:0; box-shadow:none;">👁️</button>
-        </div>
+<body class="login-page">
+  <div class="login-wrapper">
+    <div class="login-header">
+      <h1>Docházka trenérů</h1>
+      <p>Přihlaste se svým jménem a PIN kódem</p>
+    </div>
 
-        <!-- Tlačítko přihlášení (volá vaši funkci login()) -->
-        <button onclick="login()">Vstoupit do systému</button>
-        
-        <!-- Chybová hláška -->
-        <p id="error" class="login-error"></p>
+    <div class="login-box">
+      <div class="field">
+        <label for="username">Uživatelské jméno</label>
+        <input type="text" id="username" placeholder="Např. David Kropáč" autocomplete="off">
       </div>
+
+      <div class="field password-field">
+        <label for="password">PIN kód</label>
+        <input
+          type="password"
+          id="password"
+          placeholder="6 číslic"
+          maxlength="6"
+          inputmode="numeric"
+          pattern="\d{6}"
+        >
+        <button type="button" id="togglePassword" class="icon-button" aria-label="Zobrazit / skrýt heslo">👁️</button>
+      </div>
+
+      <button class="primary-btn" onclick="login()">Vstoupit do systému</button>
+
+      <p id="error" class="login-error"></p>
+    </div>
   </div>
 
   <script src="config.js"></script>
   <script src="login.js"></script>
-  
   <script>
-    // Vaše původní logika pro přepínání hesla
-    document.getElementById('togglePassword').onclick = function() {
+    // přepínání zobrazení hesla (původní funkčnost)
+    document.getElementById('togglePassword').onclick = function () {
       const pwd = document.getElementById('password');
       if (pwd.type === 'password') {
         pwd.type = 'text';
