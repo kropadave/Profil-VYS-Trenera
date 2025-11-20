@@ -90,6 +90,8 @@ async function loadDochazka() {
   // očekáváme: [datum, ..., ..., klíč, lokace]
   dochazkaAllRows = data.slice(1).filter(r => r[3] === key);
 
+  console.log("Načtená docházka (vše):", dochazkaAllRows.map(r => r[0]));
+
   renderDochazkaSection(dochazkaAllRows);
 }
 
@@ -147,26 +149,32 @@ function renderDochazkaSection(rows) {
 }
 
 /**
- * Pomocná funkce – převede text z tabulky na Date (pokud to jde).
- * Očekává formáty typu "1.1.2025 18:00" nebo "1.1.2025".
+ * Převede český formát (např. "1. 1. 2025 18:00" nebo "1.1.2025") na objekt Date.
  */
-function parseCzechDate(dateStr) {
-  if (!dateStr) return null;
+function parseCzechDate(raw) {
+  if (!raw) return null;
 
-  // oddělíme datum a čas
-  const [datePart] = dateStr.split(" ");
+  const str = raw.toString().trim();
 
-  // očekáváme "d.m.yyyy"
-  const parts = datePart.split(".");
+  // oddělit datum + čas (čas ignorujeme)
+  const [datePart] = str.split(" ");
+
+  // odstraníme případné mezery po tečkách "1. 1. 2025"
+  const normalized = datePart.replace(/\s/g, ""); // "1.1.2025"
+  const parts = normalized.split(".");
+
   if (parts.length < 3) return null;
 
   const day = parseInt(parts[0], 10);
-  const month = parseInt(parts[1], 10) - 1; // měsíce 0–11
+  const month = parseInt(parts[1], 10) - 1;
   const year = parseInt(parts[2], 10);
 
-  if (!day || !month >= 0 || !year) return null;
+  if (!day || isNaN(month) || !year) return null;
 
-  return new Date(year, month, day);
+  const d = new Date(year, month, day);
+  if (isNaN(d.getTime())) return null;
+
+  return d;
 }
 
 /**
@@ -179,19 +187,21 @@ function applyDochazkaFilter() {
   const from = document.getElementById("dateFrom").value;
   const to = document.getElementById("dateTo").value;
 
+  console.log("Filtr – exact:", exact, "from:", from, "to:", to);
+
   let filtered = dochazkaAllRows;
 
   if (exact) {
     const exactDate = new Date(exact);
     filtered = dochazkaAllRows.filter(r => {
       const d = parseCzechDate(r[0]);
-      return d && d.toDateString() === exactDate.toDateString();
+      if (!d) return false;
+      return d.toDateString() === exactDate.toDateString();
     });
   } else if (from || to) {
     let fromDate = from ? new Date(from) : null;
     let toDate = to ? new Date(to) : null;
 
-    // posunout "to" na konec dne
     if (toDate) {
       toDate.setHours(23, 59, 59, 999);
     }
@@ -204,6 +214,8 @@ function applyDochazkaFilter() {
       return true;
     });
   }
+
+  console.log("Výsledek filtru – počet řádků:", filtered.length);
 
   // přerenderovat pouze tbody
   let rowsHtml = `<tr><td colspan="2" class="muted center">Žádná docházka</td></tr>`;
