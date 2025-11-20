@@ -1,165 +1,160 @@
-const user = localStorage.getItem("user");
-if (!user) window.location.href = "index.html";
+document.addEventListener("DOMContentLoaded", () => {
+    const token = localStorage.getItem("token");
 
-// Profesionální uvítání
-const welcomeEl = document.getElementById("welcome");
-welcomeEl.innerHTML = `
-  <div style="margin-top:36px;margin-bottom:10px;">
-    <span style="font-size:2.1rem;font-weight:800;color:#644fff;letter-spacing:1px;">Docházka trenérů</span>
-  </div>
-  <div style="font-size:1.15rem;font-weight:500;color:#333;margin-bottom:4px;">Vítejte v aplikaci pro správu docházky a výplat</div>
-  <div style="font-size:1rem;font-weight:400;color:#666;">Přihlášený uživatel: <b style='color:#1fa463;'>${user}</b></div>
-`;
+    if (!token) {
+        window.location.href = "index.html";
+        return;
+    }
 
-// ------------------ FUNKCE PRO TABS ------------------
-function showTab(tab) {
-  document.querySelectorAll(".tab").forEach(t => t.style.display = "none");
-  document.getElementById(tab).style.display = "block";
+    // Nastavení Logout tlačítka
+    const logoutBtn = document.getElementById("logout-btn");
+    if (logoutBtn) {
+        logoutBtn.addEventListener("click", () => {
+            localStorage.removeItem("token");
+            window.location.href = "index.html";
+        });
+    }
+
+    fetchData(token);
+});
+
+async function fetchData(token) {
+    try {
+        const response = await fetch(`${CONFIG.API_URL}/data`, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            }
+        });
+
+        if (!response.ok) {
+            if (response.status === 401) {
+                localStorage.removeItem("token");
+                window.location.href = "index.html";
+            }
+            throw new Error("Chyba při načítání dat");
+        }
+
+        const data = await response.json();
+        renderDashboard(data);
+
+    } catch (error) {
+        console.error("Chyba:", error);
+        document.getElementById("content").innerHTML = `<p style="color: var(--danger); text-align: center;">Nepodařilo se načíst data.</p>`;
+    }
 }
 
-// ------------------ LOGOUT ------------------
-function logout() {
-  if (confirm("Opravdu se chcete odhlásit?")) {
-    localStorage.removeItem("user");
-    window.location.href = "index.html";
-  }
+function renderDashboard(data) {
+    const nav = document.getElementById("navigation");
+    const content = document.getElementById("content");
+
+    nav.innerHTML = "";
+    content.innerHTML = "";
+
+    // Vytvoříme navigační tlačítka a obsah
+    Object.keys(data).forEach((sectionName, index) => {
+        // 1. Navigační tlačítko
+        const btn = document.createElement("button");
+        btn.textContent = sectionName;
+        btn.onclick = () => {
+            // Deaktivace všech tlačítek
+            document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
+            // Aktivace kliknutého
+            btn.classList.add("active");
+            
+            // Skrytí všech sekcí
+            document.querySelectorAll(".tab").forEach(tab => tab.style.display = "none");
+            // Zobrazení vybrané sekce
+            document.getElementById(`tab-${index}`).style.display = "block";
+            
+            // Animace fadeIn při přepnutí
+            const activeTab = document.getElementById(`tab-${index}`);
+            activeTab.style.animation = 'none';
+            activeTab.offsetHeight; /* trigger reflow */
+            activeTab.style.animation = 'fadeInUp 0.5s ease-out';
+        };
+        nav.appendChild(btn);
+
+        // 2. Obsahová sekce (Tab)
+        const sectionDiv = document.createElement("div");
+        sectionDiv.id = `tab-${index}`;
+        sectionDiv.className = "tab";
+        sectionDiv.style.display = index === 0 ? "block" : "none"; // První je vidět
+
+        // Pokud je to první tlačítko, označíme ho jako aktivní
+        if (index === 0) btn.classList.add("active");
+
+        // Zpracování podsekcí (tabulek) v rámci hlavního klíče
+        const subSections = data[sectionName];
+        
+        // Iterace přes položky v sekci
+        // Očekáváme, že subSections může být pole objektů nebo objekt
+        // Zde předpokládám strukturu z vašeho původního kódu, 
+        // upravuji jen HTML obalování (wrapping)
+        
+        if (typeof subSections === 'object') {
+             // Zde generujeme "Karty" pro každou tabulku
+             for (const [subTitle, tableData] of Object.entries(subSections)) {
+                 const cardHtml = buildTableCard(subTitle, tableData);
+                 sectionDiv.innerHTML += cardHtml;
+             }
+        }
+
+        content.appendChild(sectionDiv);
+    });
 }
 
-// ------------------ FETCH DAT ZE SHEETU ------------------
-async function fetchSheet(name) {
-  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${name}?key=${API_KEY}`;
-  const res = await fetch(url);
-  const data = await res.json();
-  return data.values || [];
-}
+/**
+ * Funkce pro vytvoření moderní karty s tabulkou
+ */
+function buildTableCard(title, dataArray) {
+    if (!Array.isArray(dataArray) || dataArray.length === 0) {
+        return `
+        <div class="card-glass">
+            <h3 class="table-title">${title}</h3>
+            <p style="color: var(--text-secondary)">Žádná data k dispozici.</p>
+        </div>`;
+    }
 
-// ------------------ ZÍSKAT KLÍČ TRENÉRA ------------------
-async function getTrainerKey() {
-  const map = await fetchSheet(SHEETS.MAPA_JMEN);
-  const rows = map.slice(1);
-  const record = rows.find(r => r[1]?.trim().toLowerCase() === user.toLowerCase());
-  return record ? record[3] : null; // sloupec D = klíč
-}
+    // Získání hlaviček z prvního objektu
+    const headers = Object.keys(dataArray[0]);
 
-// ------------------ TRÉNINKY ------------------
-async function loadTreningy() {
-  const data = await fetchSheet(SHEETS.MAPA_JMEN);
-  const rows = data.slice(1);
-  const record = rows.find(r => r[1]?.trim().toLowerCase() === user.toLowerCase());
-
-  if (record) {
-    document.getElementById("treningy").innerHTML = `
-      <div style="padding:24px 0 8px 0;">
-        <h3 style="font-size:1.4em;color:#644fff;display:flex;align-items:center;gap:8px;margin-bottom:12px;">
-          <span>🏋️</span> Pravidelné tréninky
-        </h3>
-        <div style="font-size:1.1em;padding:10px 18px;background:#f7f5fb;border-radius:12px;margin-bottom:18px;min-height:32px;">
-          ${record[5] || "<span style='color:#aaa;'>Žádné pravidelné tréninky</span>"}
+    let tableHtml = `
+    <div class="card-glass">
+        <h3 class="table-title">${title}</h3>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        ${headers.map(h => `<th>${formatHeader(h)}</th>`).join('')}
+                    </tr>
+                </thead>
+                <tbody>
+                    ${dataArray.map(row => `
+                        <tr>
+                            ${headers.map(h => {
+                                const val = row[h];
+                                // Detekce, zda jde o částku (jednoduchá logika podle názvu nebo obsahu)
+                                const isAmount = typeof val === 'number' || (typeof val === 'string' && val.includes('Kč'));
+                                const cellClass = isAmount ? 'amount' : '';
+                                return `<td class="${cellClass}">${val}</td>`;
+                            }).join('')}
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
         </div>
-        <h3 style="font-size:1.2em;color:#644fff;display:flex;align-items:center;gap:8px;margin-bottom:12px;">
-          <span>🔄</span> Zástupné tréninky
-        </h3>
-        <div style="font-size:1.1em;padding:10px 18px;background:#f7f5fb;border-radius:12px;min-height:32px;">
-          ${record[6] || "<span style='color:#aaa;'>Žádné zástupné tréninky</span>"}
-        </div>
-      </div>
+    </div>
     `;
-  } else {
-    document.getElementById("treningy").innerHTML = `<p>Žádné tréninky k zobrazení.</p>`;
-  }
+
+    return tableHtml;
 }
 
-// ------------------ DOCHÁZKA ------------------
-async function loadDochazka() {
-  const key = await getTrainerKey();
-  if (!key) {
-    document.getElementById("dochazka").innerHTML = "<p>Nenalezen tvůj přihlašovací klíč.</p>";
-    return;
-  }
-
-  const data = await fetchSheet(SHEETS.SUPER_DOCHAZKA);
-  const rows = data.slice(1).filter(r => r[3] === key);
-
-  let html = `<tr><td colspan="2">Žádná docházka</td></tr>`;
-  if (rows.length > 0) {
-    html = rows.map(r => `<tr><td>${r[0]}</td><td>${r[4]}</td></tr>`).join("");
-  }
-
-  document.getElementById("dochazka").innerHTML = `
-    <h3>Historie docházky</h3>
-    <table>
-      <tr><th>Datum a čas</th><th>Lokace</th></tr>
-      ${html}
-    </table>
-  `;
+function formatHeader(header) {
+    // Převede camelCase nebo snake_case na čitelný text
+    // např. "celkovaCena" -> "Celkova Cena"
+    return header
+        .replace(/([A-Z])/g, ' $1')
+        .replace(/^./, str => str.toUpperCase());
 }
-
-// ------------------ VÝPLATY ------------------
-
-async function loadVyplaty() {
-  const key = await getTrainerKey();
-  if (!key) {
-    document.getElementById("vyplaty").innerHTML = "<p>Trenér nebyl nalezen v MapaJmen.</p>";
-    return;
-  }
-
-  const data = await fetchSheet(SHEETS.VYPLATY);
-
-  // ✅ měsíc je v B1
-  const month = data[0][1] || "Neznámý měsíc";
-
-  const rows = data.slice(2); 
-  const myPayments = rows.filter(r => r[0] === key);
-
-  let html = `<tr><td colspan="3">Žádné výplaty k zobrazení</td></tr>`;
-
-  if (myPayments.length > 0) {
-    html = myPayments.map(r => {
-      const count = r[2] || 0;               
-      const amount = r[3] || count * 400;    
-
-      return `<tr>
-        <td>${month}</td>
-        <td>${count}</td>
-        <td class="amount">${amount}</td>
-      </tr>`;
-    }).join("");
-  }
-
-  document.getElementById("vyplaty").innerHTML = `
-    <h3>Přehled výplat</h3>
-    <table>
-      <tr><th>Měsíc</th><th>Počet tréninků</th><th>Částka (Kč)</th></tr>
-      ${html}
-    </table>
-  `;
-}
-
-// ------------------ HISTORIE VÝPLAT ------------------
-async function loadHistorieVyplat() {
-  const data = await fetchSheet(SHEETS.ZAZNAMY_VYPLAT);
-  const rows = data.slice(1).filter(r => r[0]?.trim().toLowerCase() === user.toLowerCase());
-
-  let html = `<tr><td colspan="3">Žádné záznamy</td></tr>`;
-  if (rows.length > 0) {
-    html = rows.map(r => {
-      const paid = r[2] === 'TRUE' ? "<span style='font-size:1.3em;'>✅</span>" : r[2];
-      return `<tr><td>${r[1]}</td><td>${paid}</td><td class='amount'>${r[3]}</td></tr>`;
-    }).join("");
-  }
-
-  document.getElementById("historie").innerHTML = `
-    <h3>Záznamy výplat</h3>
-    <table>
-      <tr><th>Měsíc</th><th>Vyplaceno</th><th>Částka</th></tr>
-      ${html}
-    </table>
-  `;
-}
-
-// ------------------ NAČTENÍ DAT ------------------
-loadTreningy();
-loadDochazka();
-loadVyplaty();
-loadHistorieVyplat();
-showTab("treningy");
