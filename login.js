@@ -1,35 +1,86 @@
-async function login() {
-  const username = document.getElementById("username").value.trim();
-  const password = document.getElementById("password").value.trim();
-  const errorEl = document.getElementById("error");
+document.addEventListener("DOMContentLoaded", () => {
+    const loginBtn = document.getElementById("login-btn");
+    const usernameInput = document.getElementById("username");
+    const passwordInput = document.getElementById("password");
+    const errorMsg = document.getElementById("error-msg");
 
-  errorEl.textContent = "";
-  errorEl.classList.remove("login-error");
+    // Funkce pro přihlášení
+    async function handleLogin() {
+        const username = usernameInput.value.trim();
+        const password = passwordInput.value.trim();
 
-  if (!/^\d{6}$/.test(password)) {
-    errorEl.textContent = "Heslo musí být přesně 6 číslic.";
-    errorEl.classList.add("login-error");
-    return;
-  }
+        errorMsg.textContent = ""; // Vymazat předchozí chyby
+        loginBtn.innerHTML = '<div class="loader"></div> Načítám...'; // Indikace načítání (pokud máte CSS pro loader)
 
-  try {
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEETS.MAPA_JMEN}?key=${API_KEY}`;
-    const res = await fetch(url);
-    const data = await res.json();
-    const rows = data.values.slice(1);
+        if (!username || !password) {
+            errorMsg.textContent = "Vyplňte prosím obě pole.";
+            resetButton();
+            return;
+        }
 
-    const user = rows.find(r => r[1] === username && r[3] === password); // B = jméno, D = heslo
+        try {
+            // Načtení databáze uživatelů
+            // Používáme CONFIG.API_URL z config.js
+            const response = await fetch(CONFIG.API_URL);
+            
+            if (!response.ok) {
+                throw new Error(`Chyba sítě: ${response.status}`);
+            }
 
-    if (user) {
-      localStorage.setItem("user", username);
-      window.location.href = "dashboard.html";
-    } else {
-      errorEl.textContent = "Nesprávné jméno nebo heslo.";
-      errorEl.classList.add("login-error");
+            const data = await response.json();
+            
+            // Hledání uživatele v datech
+            // Předpokládáme strukturu: { "users": [ { "username": "...", "password": "...", "role": "..." } ] }
+            // NEBO pokud je meta.json přímo pole uživatelů, upravíme logiku níže.
+            
+            let user = null;
+
+            // Varianta 1: meta.json obsahuje objekt s klíčem "users"
+            if (data.users && Array.isArray(data.users)) {
+                user = data.users.find(u => u.username === username && u.password === password);
+            } 
+            // Varianta 2: meta.json je přímo pole objektů
+            else if (Array.isArray(data)) {
+                user = data.find(u => u.username === username && u.password === password);
+            }
+            // Varianta 3: Specifická struktura pro váš projekt?
+            else {
+                console.error("Neznámá struktura JSON dat:", data);
+            }
+
+            if (user) {
+                // Úspěšné přihlášení
+                localStorage.setItem("token", "logged_in"); // Jednoduchý token
+                localStorage.setItem("currentUser", JSON.stringify(user));
+                
+                loginBtn.innerHTML = '<span>Úspěch!</span>';
+                loginBtn.style.background = 'var(--success)';
+                
+                setTimeout(() => {
+                    window.location.href = "dashboard.html";
+                }, 500);
+            } else {
+                errorMsg.textContent = "Špatné jméno nebo heslo.";
+                resetButton();
+            }
+
+        } catch (error) {
+            console.error("Chyba přihlášení:", error);
+            errorMsg.textContent = "Chyba připojení k databázi (meta.json nenalezen).";
+            resetButton();
+        }
     }
-  } catch (err) {
-    console.error(err);
-    errorEl.textContent = "Chyba při přihlášení.";
-    errorEl.classList.add("login-error");
-  }
-}
+
+    function resetButton() {
+        loginBtn.innerHTML = '<span>Vstoupit do systému</span><div class="arrow">→</div>';
+        loginBtn.style.background = ''; // Reset barvy
+    }
+
+    // Event listenery
+    loginBtn.addEventListener("click", handleLogin);
+
+    // Odeslání Enterem
+    passwordInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") handleLogin();
+    });
+});
