@@ -1,119 +1,203 @@
 /* ------------------------------------
-   RESET & VARIABLES
+   MODERNÍ "GLASSMORPHISM" VZHLED
 ------------------------------------ */
 :root {
     --bg-dark: #0f172a;
     --bg-gradient: radial-gradient(circle at top right, #1e1b4b, #0f172a);
     
-    /* Glassmorphism */
+    /* Skleněný efekt */
     --glass-bg: rgba(30, 41, 59, 0.7);
     --glass-border: rgba(255, 255, 255, 0.1);
     --glass-highlight: rgba(255, 255, 255, 0.15);
     
-    /* Colors */
+    /* Barvy textu */
     --text-primary: #ffffff;
     --text-secondary: #94a3b8;
-    --primary: #6366f1;
+    --text-accent: #38bdf8; /* Cyan neon */
+    
+    /* Akční barvy */
+    --primary: #6366f1;     /* Indigo */
     --primary-glow: rgba(99, 102, 241, 0.4);
     --success: #34d399;
     --danger: #f87171;
+
     --radius: 16px;
-    --font-main: 'Poppins', sans-serif;
+    --font-main: 'Segoe UI', Roboto, sans-serif;
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+}
 
 body {
     font-family: var(--font-main);
     background: var(--bg-dark);
     background-image: var(--bg-gradient);
+    background-attachment: fixed;
     color: var(--text-primary);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    background-attachment: fixed;
-}
-
-/* ------------------------------------
-   HEADER
------------------------------------- */
-header {
-    display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 20px 24px;
-    max-width: 1200px;
-    width: 100%;
-    margin: 0 auto;
+    overflow-x: hidden;
 }
-
-.logo { font-size: 1.5rem; font-weight: 700; color: white; }
-.logo span { color: var(--primary); }
-
-.logout-icon {
-    background: rgba(255,255,255,0.1);
-    border: 1px solid var(--glass-border);
-    color: white;
-    width: 40px; height: 40px;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer; transition: all 0.3s;
-}
-.logout-icon:hover { background: var(--danger); }
 
 /* ------------------------------------
-   NAVIGATION (Generovaná vaším JS)
+   LOGIN PAGE
+------------------------------------ */
+.login-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 80vh;
+    width: 100%;
+    padding: 20px;
+}
+
+h2 {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    background: linear-gradient(to right, #fff, #94a3b8);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-align: center;
+}
+
+.login-box {
+    width: 100%;
+    max-width: 400px;
+    padding: 40px 30px;
+    text-align: center;
+    border-radius: 24px;
+    background: rgba(15, 23, 42, 0.6); /* Tmavé průhledné pozadí */
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    animation: slideUp 0.6s ease-out;
+}
+
+input {
+    width: 100%;
+    padding: 16px;
+    margin: 10px 0;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    color: white;
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.3s;
+}
+
+input:focus {
+    border-color: var(--primary);
+    background: rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 0 2px var(--primary-glow);
+}
+
+button {
+    width: 100%;
+    padding: 16px;
+    margin-top: 20px;
+    border: none;
+    border-radius: 12px;
+    background: var(--primary);
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 15px var(--primary-glow);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+button:hover {
+    background: #4f46e5;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px var(--primary-glow);
+}
+
+.login-error {
+    color: var(--danger);
+    margin-top: 15px;
+    font-size: 0.9rem;
+    min-height: 20px;
+}
+
+/* ------------------------------------
+   DASHBOARD NAVIGATION
 ------------------------------------ */
 nav {
     display: flex;
     gap: 10px;
     overflow-x: auto;
-    padding: 10px 24px 20px 24px;
+    padding: 20px;
     width: 100%;
     max-width: 1200px;
-    margin: 0 auto;
+    justify-content: flex-start; /* Na mobilu zarovnat doleva */
     scrollbar-width: none;
 }
+
 nav::-webkit-scrollbar { display: none; }
 
-/* Stylování tlačítek, i když nemají třídy */
 nav button {
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid var(--glass-border);
     color: var(--text-secondary);
-    padding: 10px 20px;
+    padding: 12px 24px;
     border-radius: 30px;
-    font-family: var(--font-main);
     font-size: 0.9rem;
     font-weight: 500;
     white-space: nowrap;
-    cursor: pointer;
-    transition: all 0.3s;
-    backdrop-filter: blur(10px);
+    margin: 0;
+    width: auto;
+    box-shadow: none;
+    text-transform: none;
 }
 
-nav button:hover { background: var(--glass-highlight); color: white; }
-
-/* Pokud váš JS přidává třídu .active */
-nav button.active, nav button:focus {
-    background: var(--primary);
-    border-color: var(--primary);
+nav button:hover {
+    background: var(--glass-highlight);
     color: white;
-    box-shadow: 0 0 15px var(--primary-glow);
+    transform: none;
+}
+
+/* Styl pro aktivní tlačítko (přidáme v JS, pokud chcete, nebo jen hover) */
+nav button:focus {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+nav button.logout {
+    margin-left: auto;
+    background: rgba(248, 113, 113, 0.15);
+    color: var(--danger);
+    border-color: rgba(248, 113, 113, 0.3);
+}
+
+nav button.logout:hover {
+    background: var(--danger);
+    color: white;
 }
 
 /* ------------------------------------
-   CONTENT & TABLES (Třída .tab z vašeho JS)
+   CONTENT & TABLES
 ------------------------------------ */
 #content {
     width: 100%;
     max-width: 1200px;
-    margin: 0 auto;
     padding: 0 20px 40px 20px;
 }
 
-/* Zde je trik: Stylujeme .tab jako skleněnou kartu */
 .tab {
+    display: none;
     background: var(--glass-bg);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
@@ -122,29 +206,28 @@ nav button.active, nav button:focus {
     padding: 24px;
     margin-bottom: 30px;
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-    animation: fadeInUp 0.5s ease-out;
+    animation: fadeIn 0.5s ease-out;
 }
 
-h2, h3, .table-title {
-    color: white;
-    margin: 0 0 16px 0;
-    font-weight: 600;
+.tab:target { display: block; }
+
+h3 {
+    color: var(--text-accent);
     font-size: 1.3rem;
+    margin-bottom: 20px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
-.table-subtitle { color: var(--text-secondary); margin-bottom: 20px; }
-
-/* Vynucení moderního vzhledu pro JAKOUKOLIV tabulku */
-.table-responsive { overflow-x: auto; width: 100%; }
 
 table {
     width: 100%;
     border-collapse: collapse;
-    min-width: 600px; /* Scroll na mobilu */
-    color: var(--text-primary);
+    margin-top: 10px;
 }
 
 th {
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(255, 255, 255, 0.05);
     color: var(--text-secondary);
     font-weight: 600;
     text-transform: uppercase;
@@ -157,96 +240,75 @@ th {
 
 td {
     padding: 16px;
-    color: white !important; /* Důležité pro viditelnost */
+    color: white;
     border-bottom: 1px solid var(--glass-border);
+    font-size: 0.95rem;
 }
 
-tr:hover td { background: rgba(255, 255, 255, 0.05); }
+tr:hover td {
+    background: rgba(255, 255, 255, 0.05);
+}
 
-/* Zelené částky */
+/* Zvýraznění částek */
 td.amount, .amount {
     color: var(--success) !important;
-    font-family: 'Courier New', monospace;
+    font-family: 'Courier New', monospace; /* Technický font pro čísla */
     font-weight: 700;
+    font-size: 1rem;
+}
+
+/* Responsivní tabulka */
+.table-responsive, 
+/* Automaticky aplikovat na tabulky uvnitř .tab, i když nemají wrapper */
+.tab table { 
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+/* Welcome message style override */
+#welcome div {
+    color: var(--text-primary) !important;
+}
+#welcome span {
+    color: var(--primary) !important;
+    text-shadow: 0 0 20px var(--primary-glow);
+}
+#welcome b {
+    color: var(--success) !important;
 }
 
 /* ------------------------------------
-   LOGIN PAGE (Speciální styly)
+   ANIMATIONS
 ------------------------------------ */
-.login-page {
-    align-items: center;
-    justify-content: center;
-}
-
-.login-wrapper {
-    width: 90%;
-    max-width: 400px;
-    padding: 40px 30px;
-    text-align: center;
-    border-radius: 24px;
-    background: rgba(15, 23, 42, 0.6);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255,255,255,0.1);
-    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-}
-
-.login-header h2 {
-    font-size: 2rem;
-    margin-bottom: 8px;
-    background: linear-gradient(to right, #fff, #94a3b8);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-}
-.login-header p { color: var(--text-secondary); margin-bottom: 30px; }
-
-/* Inputy na login stránce */
-input {
-    width: 100%;
-    padding: 16px;
-    margin-bottom: 16px;
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid var(--glass-border);
-    border-radius: 12px;
-    color: white;
-    font-size: 1rem;
-    outline: none;
-    transition: 0.3s;
-}
-input:focus {
-    border-color: var(--primary);
-    background: rgba(0, 0, 0, 0.5);
-    box-shadow: 0 0 0 2px var(--primary-glow);
-}
-
-button#login-btn {
-    width: 100%;
-    padding: 16px;
-    margin-top: 10px;
-    border: none;
-    border-radius: 12px;
-    background: var(--primary);
-    color: white;
-    font-weight: 600;
-    font-size: 1rem;
-    cursor: pointer;
-    display: flex; justify-content: center; align-items: center; gap: 10px;
-    box-shadow: 0 4px 15px var(--primary-glow);
-    transition: 0.3s;
-}
-button#login-btn:hover { transform: translateY(-2px); }
-.arrow { transition: transform 0.3s; }
-button:hover .arrow { transform: translateX(5px); }
-
-#error-msg { color: var(--danger); margin-top: 15px; font-size: 0.9rem; min-height: 20px; }
-
-@keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(20px); }
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(30px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* ------------------------------------
+   MOBILE TWEAKS
+------------------------------------ */
 @media (max-width: 600px) {
-    .tab { padding: 16px; border-radius: 16px; }
-    th, td { padding: 12px; font-size: 0.85rem; }
+    nav {
+        padding: 10px 15px;
+    }
+    .tab {
+        padding: 15px;
+        border-radius: 16px;
+    }
+    th, td {
+        padding: 12px 10px;
+        font-size: 0.85rem;
+    }
+    .login-box {
+        padding: 30px 20px;
+        max-width: 100%;
+    }
     h2 { font-size: 1.5rem; }
 }
