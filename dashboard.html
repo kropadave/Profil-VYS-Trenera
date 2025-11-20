@@ -3,47 +3,38 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Dashboard</title>
+  <title>Docházka Trenérů - Přehled</title>
   <link rel="stylesheet" href="style.css">
 </head>
 
-<body>
-  <!-- Uvítací text (plněno přes JS) -->
-  <div id="welcome" style="margin-top: 30px; text-align: center;"></div>
+<body class="dashboard-page">
+  <header class="top-bar">
+    <div id="welcome" class="welcome"></div>
+    <button class="logout-chip" onclick="logout()">Odhlásit</button>
+  </header>
 
-  <!-- Navigace - pilulky -->
-  <nav>
-    <button onclick="showTab('treningy')">Tréninky</button>
-    <button onclick="showTab('dochazka')">Docházka</button>
-    <button onclick="showTab('vyplaty')">Výplaty</button>
-    <button onclick="showTab('historie')">Historie</button>
-    <button class="logout" onclick="logout()">Odhlásit</button>
+  <nav class="tabs-nav">
+    <button onclick="showTab('treningy')">🏋️ Tréninky</button>
+    <button onclick="showTab('dochazka')">📅 Docházka</button>
+    <button onclick="showTab('vyplaty')">💰 Výplaty</button>
+    <button onclick="showTab('historie')">📜 Historie výplat</button>
   </nav>
 
-  <div id="content">
+  <main id="content" class="content">
 
     <!-- TRÉNINKY -->
-    <section id="treningy" class="tab" style="display:block;">
-        <!-- Obsah se načte přes JS -->
-    </section>
+    <section id="treningy" class="tab"></section>
 
     <!-- DOCHÁZKA -->
-    <section id="dochazka" class="tab">
-        <!-- Obsah se načte přes JS -->
-    </section>
+    <section id="dochazka" class="tab"></section>
 
     <!-- VÝPLATY -->
-    <section id="vyplaty" class="tab">
-      <!-- Obsah se načte přes JS -->
-      <div id="vyplatyContent"></div>
-    </section>
+    <section id="vyplaty" class="tab"></section>
 
     <!-- HISTORIE VÝPLAT -->
-    <section id="historie" class="tab">
-        <!-- Obsah se načte přes JS -->
-    </section>
+    <section id="historie" class="tab"></section>
 
-  </div>
+  </main>
 
   <script src="config.js"></script>
   <script src="dashboard.js"></script>
