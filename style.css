@@ -5,32 +5,23 @@
     --bg-dark: #0f172a;
     --bg-gradient: radial-gradient(circle at top right, #1e1b4b, #0f172a);
     
-    /* Glassmorphism Colors */
-    --glass-bg: rgba(255, 255, 255, 0.05);
+    /* Glassmorphism */
+    --glass-bg: rgba(30, 41, 59, 0.7);
     --glass-border: rgba(255, 255, 255, 0.1);
     --glass-highlight: rgba(255, 255, 255, 0.15);
     
-    /* Text Colors */
+    /* Colors */
     --text-primary: #ffffff;
     --text-secondary: #94a3b8;
-    --text-accent: #38bdf8; /* Cyan neon */
-    
-    /* Actions */
-    --primary: #6366f1;     /* Indigo */
+    --primary: #6366f1;
     --primary-glow: rgba(99, 102, 241, 0.4);
     --success: #34d399;
     --danger: #f87171;
-
     --radius: 16px;
     --font-main: 'Poppins', sans-serif;
 }
 
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    -webkit-tap-highlight-color: transparent;
-}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
 body {
     font-family: var(--font-main);
@@ -40,11 +31,11 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    overflow-x: hidden;
+    background-attachment: fixed;
 }
 
 /* ------------------------------------
-   HEADER & LOGO
+   HEADER
 ------------------------------------ */
 header {
     display: flex;
@@ -56,53 +47,38 @@ header {
     margin: 0 auto;
 }
 
-.logo {
-    font-size: 1.5rem;
-    font-weight: 700;
-    letter-spacing: -0.5px;
-    color: white;
-}
-
-.logo span {
-    color: var(--primary);
-}
+.logo { font-size: 1.5rem; font-weight: 700; color: white; }
+.logo span { color: var(--primary); }
 
 .logout-icon {
     background: rgba(255,255,255,0.1);
-    border: none;
+    border: 1px solid var(--glass-border);
     color: white;
-    width: 40px;
-    height: 40px;
+    width: 40px; height: 40px;
     border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.3s;
 }
-
-.logout-icon:hover {
-    background: var(--danger);
-    transform: rotate(90deg);
-}
+.logout-icon:hover { background: var(--danger); }
 
 /* ------------------------------------
-   NAVIGATION (Scrollable Pills)
+   NAVIGATION (Generovaná vaším JS)
 ------------------------------------ */
 nav {
     display: flex;
-    gap: 12px;
+    gap: 10px;
     overflow-x: auto;
     padding: 10px 24px 20px 24px;
     width: 100%;
     max-width: 1200px;
     margin: 0 auto;
-    scrollbar-width: none; /* Firefox */
+    scrollbar-width: none;
 }
-nav::-webkit-scrollbar { display: none; } /* Chrome/Safari */
+nav::-webkit-scrollbar { display: none; }
 
+/* Stylování tlačítek, i když nemají třídy */
 nav button {
-    background: var(--glass-bg);
+    background: rgba(255, 255, 255, 0.05);
     border: 1px solid var(--glass-border);
     color: var(--text-secondary);
     padding: 10px 20px;
@@ -112,16 +88,13 @@ nav button {
     font-weight: 500;
     white-space: nowrap;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.3s;
     backdrop-filter: blur(10px);
 }
 
-nav button:hover {
-    background: var(--glass-highlight);
-    color: white;
-}
+nav button:hover { background: var(--glass-highlight); color: white; }
 
-/* Aktivní stav tlačítka (pokud ho JS nastaví) - můžete přidat třídu .active v JS */
+/* Pokud váš JS přidává třídu .active */
 nav button.active, nav button:focus {
     background: var(--primary);
     border-color: var(--primary);
@@ -129,27 +102,19 @@ nav button.active, nav button:focus {
     box-shadow: 0 0 15px var(--primary-glow);
 }
 
-/* Logout tlačítko v navigaci (pokud tam je) */
-nav button.logout {
-    margin-left: auto;
-    border-color: rgba(248, 113, 113, 0.3);
-    color: var(--danger);
-}
-
 /* ------------------------------------
-   MAIN CONTENT & CARDS
+   CONTENT & TABLES (Třída .tab z vašeho JS)
 ------------------------------------ */
 #content {
     width: 100%;
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px 40px 20px;
-    animation: fadeInUp 0.6s ease-out;
 }
 
-/* Glass Card Container pro Tabulky */
-.card-glass {
-    background: rgba(30, 41, 59, 0.7); /* Poloprůhledná tmavá */
+/* Zde je trik: Stylujeme .tab jako skleněnou kartu */
+.tab {
+    background: var(--glass-bg);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid var(--glass-border);
@@ -157,43 +122,25 @@ nav button.logout {
     padding: 24px;
     margin-bottom: 30px;
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    animation: fadeInUp 0.5s ease-out;
 }
 
-h2, h3 {
+h2, h3, .table-title {
     color: white;
-    margin-bottom: 20px;
+    margin: 0 0 16px 0;
     font-weight: 600;
+    font-size: 1.3rem;
 }
+.table-subtitle { color: var(--text-secondary); margin-bottom: 20px; }
 
-.table-title {
-    font-size: 1.25rem;
-    color: var(--text-accent);
-    margin-bottom: 8px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-weight: 700;
-}
-
-.table-subtitle {
-    color: var(--text-secondary);
-    margin-bottom: 24px;
-    font-size: 0.9rem;
-}
-
-/* ------------------------------------
-   TABLES (The most important part)
------------------------------------- */
-.table-responsive {
-    width: 100%;
-    overflow-x: auto;
-    border-radius: 12px;
-}
+/* Vynucení moderního vzhledu pro JAKOUKOLIV tabulku */
+.table-responsive { overflow-x: auto; width: 100%; }
 
 table {
     width: 100%;
     border-collapse: collapse;
-    min-width: 600px; /* Vynutí scroll na mobilu */
-    font-size: 0.95rem;
+    min-width: 600px; /* Scroll na mobilu */
+    color: var(--text-primary);
 }
 
 th {
@@ -210,34 +157,30 @@ th {
 
 td {
     padding: 16px;
-    color: var(--text-primary); /* BÍLÝ TEXT - ZÁSADNÍ */
+    color: white !important; /* Důležité pro viditelnost */
     border-bottom: 1px solid var(--glass-border);
-    vertical-align: middle;
 }
 
-tr:last-child td {
-    border-bottom: none;
-}
+tr:hover td { background: rgba(255, 255, 255, 0.05); }
 
-tr:hover td {
-    background: rgba(255, 255, 255, 0.05); /* Hover efekt řádku */
-}
-
-/* Zvýraznění částek */
+/* Zelené částky */
 td.amount, .amount {
-    color: var(--success);
+    color: var(--success) !important;
     font-family: 'Courier New', monospace;
     font-weight: 700;
-    font-size: 1rem;
 }
 
 /* ------------------------------------
-   LOGIN SCREEN
+   LOGIN PAGE (Speciální styly)
 ------------------------------------ */
+.login-page {
+    align-items: center;
+    justify-content: center;
+}
+
 .login-wrapper {
     width: 90%;
     max-width: 400px;
-    margin: 10vh auto;
     padding: 40px 30px;
     text-align: center;
     border-radius: 24px;
@@ -255,32 +198,28 @@ td.amount, .amount {
     background-clip: text;
     color: transparent;
 }
+.login-header p { color: var(--text-secondary); margin-bottom: 30px; }
 
-.login-header p {
-    color: var(--text-secondary);
-    margin-bottom: 30px;
-}
-
+/* Inputy na login stránce */
 input {
     width: 100%;
     padding: 16px;
     margin-bottom: 16px;
-    background: rgba(0, 0, 0, 0.2);
+    background: rgba(0, 0, 0, 0.3);
     border: 1px solid var(--glass-border);
     border-radius: 12px;
     color: white;
     font-size: 1rem;
     outline: none;
-    transition: all 0.3s;
+    transition: 0.3s;
 }
-
 input:focus {
     border-color: var(--primary);
-    background: rgba(0, 0, 0, 0.4);
-    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+    background: rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 0 2px var(--primary-glow);
 }
 
-button {
+button#login-btn {
     width: 100%;
     padding: 16px;
     margin-top: 10px;
@@ -291,56 +230,23 @@ button {
     font-weight: 600;
     font-size: 1rem;
     cursor: pointer;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    transition: all 0.3s;
+    display: flex; justify-content: center; align-items: center; gap: 10px;
     box-shadow: 0 4px 15px var(--primary-glow);
+    transition: 0.3s;
 }
+button#login-btn:hover { transform: translateY(-2px); }
+.arrow { transition: transform 0.3s; }
+button:hover .arrow { transform: translateX(5px); }
 
-button:hover {
-    background: #4f46e5;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px var(--primary-glow);
-}
+#error-msg { color: var(--danger); margin-top: 15px; font-size: 0.9rem; min-height: 20px; }
 
-.arrow {
-    transition: transform 0.3s;
-}
-button:hover .arrow {
-    transform: translateX(5px);
-}
-
-#error-msg {
-    color: var(--danger);
-    margin-top: 15px;
-    font-size: 0.9rem;
-    min-height: 20px;
-}
-
-/* ------------------------------------
-   ANIMATIONS & MEDIA QUERIES
------------------------------------- */
 @keyframes fadeInUp {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
 @media (max-width: 600px) {
-    .card-glass {
-        padding: 16px;
-        border-radius: 16px;
-    }
-    
-    th, td {
-        padding: 12px;
-        font-size: 0.85rem;
-    }
-    
+    .tab { padding: 16px; border-radius: 16px; }
+    th, td { padding: 12px; font-size: 0.85rem; }
     h2 { font-size: 1.5rem; }
-    
-    nav {
-        padding: 0 16px 16px 16px;
-    }
 }
