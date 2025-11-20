@@ -9,7 +9,7 @@ welcomeEl.innerHTML = `
   <div class="welcome-user">Přihlášený uživatel: <b>${user}</b></div>
 `;
 
-// ------------------ FUNKCE PRO TABS ------------------
+// ------------------ TABS ------------------
 function showTab(tab) {
   document.querySelectorAll(".tab").forEach(t => t.style.display = "none");
   const active = document.getElementById(tab);
@@ -30,7 +30,7 @@ function logout() {
   }
 }
 
-// ------------------ FETCH DAT ZE SHEETU ------------------
+// ------------------ GOOGLE SHEETS HELPER ------------------
 async function fetchSheet(name) {
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${name}?key=${API_KEY}`;
   const res = await fetch(url);
@@ -38,7 +38,7 @@ async function fetchSheet(name) {
   return data.values || [];
 }
 
-// ------------------ ZÍSKAT KLÍČ TRENÉRA ------------------
+// ------------------ KLÍČ TRENÉRA ------------------
 async function getTrainerKey() {
   const map = await fetchSheet(SHEETS.MAPA_JMEN);
   const rows = map.slice(1);
@@ -74,7 +74,9 @@ async function loadTreningy() {
   }
 }
 
-// ------------------ DOCHÁZKA ------------------
+// ------------------ DOCHÁZKA – DATA A FILTR ------------------
+let dochazkaAllRows = []; // uložíme si všechny záznamy po načtení
+
 async function loadDochazka() {
   const key = await getTrainerKey();
   const el = document.getElementById("dochazka");
@@ -85,7 +87,18 @@ async function loadDochazka() {
   }
 
   const data = await fetchSheet(SHEETS.SUPER_DOCHAZKA);
-  const rows = data.slice(1).filter(r => r[3] === key);
+  // očekáváme: [datum, ..., ..., klíč, lokace]
+  dochazkaAllRows = data.slice(1).filter(r => r[3] === key);
+
+  renderDochazkaSection(dochazkaAllRows);
+}
+
+/**
+ * Vykreslí kartu docházky včetně filtrů
+ * @param {Array} rows - pole řádků (filtrovaných)
+ */
+function renderDochazkaSection(rows) {
+  const el = document.getElementById("dochazka");
 
   let rowsHtml = `<tr><td colspan="2" class="muted center">Žádná docházka</td></tr>`;
   if (rows.length > 0) {
@@ -95,18 +108,122 @@ async function loadDochazka() {
   el.innerHTML = `
     <div class="card">
       <h3>Historie docházky</h3>
+
+      <div class="filter-row">
+        <div class="filter-field">
+          <label for="dateExact">Konkrétní datum</label>
+          <input type="date" id="dateExact">
+        </div>
+        <div class="filter-field">
+          <label for="dateFrom">Od</label>
+          <input type="date" id="dateFrom">
+        </div>
+        <div class="filter-field">
+          <label for="dateTo">Do</label>
+          <input type="date" id="dateTo">
+        </div>
+        <div class="filter-buttons">
+          <button class="secondary-btn" id="filterApply">Filtrovat</button>
+          <button class="ghost-btn" id="filterClear">Vymazat</button>
+        </div>
+      </div>
+
       <div class="table-wrapper">
         <table>
           <thead>
             <tr><th>Datum a čas</th><th>Lokace</th></tr>
           </thead>
-          <tbody>
+          <tbody id="dochazkaBody">
             ${rowsHtml}
           </tbody>
         </table>
       </div>
     </div>
   `;
+
+  // Přiřadit události tlačítkům
+  document.getElementById("filterApply").onclick = applyDochazkaFilter;
+  document.getElementById("filterClear").onclick = clearDochazkaFilter;
+}
+
+/**
+ * Pomocná funkce – převede text z tabulky na Date (pokud to jde).
+ * Očekává formáty typu "1.1.2025 18:00" nebo "1.1.2025".
+ */
+function parseCzechDate(dateStr) {
+  if (!dateStr) return null;
+
+  // oddělíme datum a čas
+  const [datePart] = dateStr.split(" ");
+
+  // očekáváme "d.m.yyyy"
+  const parts = datePart.split(".");
+  if (parts.length < 3) return null;
+
+  const day = parseInt(parts[0], 10);
+  const month = parseInt(parts[1], 10) - 1; // měsíce 0–11
+  const year = parseInt(parts[2], 10);
+
+  if (!day || !month >= 0 || !year) return null;
+
+  return new Date(year, month, day);
+}
+
+/**
+ * Aplikace filtru docházky:
+ *  - Pokud je vyplněno "Konkrétní datum" => filtr jen na ten den.
+ *  - Jinak pokud je vyplněno Od/Do => filtr na rozmezí.
+ */
+function applyDochazkaFilter() {
+  const exact = document.getElementById("dateExact").value;
+  const from = document.getElementById("dateFrom").value;
+  const to = document.getElementById("dateTo").value;
+
+  let filtered = dochazkaAllRows;
+
+  if (exact) {
+    const exactDate = new Date(exact);
+    filtered = dochazkaAllRows.filter(r => {
+      const d = parseCzechDate(r[0]);
+      return d && d.toDateString() === exactDate.toDateString();
+    });
+  } else if (from || to) {
+    let fromDate = from ? new Date(from) : null;
+    let toDate = to ? new Date(to) : null;
+
+    // posunout "to" na konec dne
+    if (toDate) {
+      toDate.setHours(23, 59, 59, 999);
+    }
+
+    filtered = dochazkaAllRows.filter(r => {
+      const d = parseCzechDate(r[0]);
+      if (!d) return false;
+      if (fromDate && d < fromDate) return false;
+      if (toDate && d > toDate) return false;
+      return true;
+    });
+  }
+
+  // přerenderovat pouze tbody
+  let rowsHtml = `<tr><td colspan="2" class="muted center">Žádná docházka</td></tr>`;
+  if (filtered.length > 0) {
+    rowsHtml = filtered.map(r => `<tr><td>${r[0]}</td><td>${r[4]}</td></tr>`).join("");
+  }
+  document.getElementById("dochazkaBody").innerHTML = rowsHtml;
+}
+
+/** Vymazat filtr – zobrazit vše */
+function clearDochazkaFilter() {
+  document.getElementById("dateExact").value = "";
+  document.getElementById("dateFrom").value = "";
+  document.getElementById("dateTo").value = "";
+
+  let rowsHtml = `<tr><td colspan="2" class="muted center">Žádná docházka</td></tr>`;
+  if (dochazkaAllRows.length > 0) {
+    rowsHtml = dochazkaAllRows.map(r => `<tr><td>${r[0]}</td><td>${r[4]}</td></tr>`).join("");
+  }
+  document.getElementById("dochazkaBody").innerHTML = rowsHtml;
 }
 
 // ------------------ VÝPLATY ------------------
@@ -200,7 +317,7 @@ async function loadHistorieVyplat() {
   `;
 }
 
-// ------------------ NAČTENÍ DAT ------------------
+// ------------------ START ------------------
 loadTreningy();
 loadDochazka();
 loadVyplaty();
