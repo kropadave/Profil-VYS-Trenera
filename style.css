@@ -1,332 +1,316 @@
 /* ------------------------------------
-   VARIABLES & RESET
+   1. VARIABLES & SETUP
 ------------------------------------ */
 :root {
-    /* Moderní paleta - Indigo & Slate */
-    --primary: #4f46e5;      /* Hluboká indigo */
-    --primary-hover: #4338ca;
-    --bg-body: #f3f4f6;      /* Velmi světle šedá, neunavuje oči */
-    --bg-surface: #ffffff;
-    --text-main: #111827;    /* Téměř černá pro hlavní text */
-    --text-muted: #6b7280;   /* Šedá pro popisky */
-    --border-color: #e5e7eb; /* Jemné ohraničení */
-    --success: #059669;      /* Profesionální zelená */
-    --danger: #dc2626;       /* Profesionální červená */
+    /* Moderní Fintech Paleta - "Clean & Crisp" */
+    --bg-app: #f8f9fa;           /* Velmi světlá šedá */
+    --surface: #ffffff;          /* Čistá bílá */
+    --accent: #0f172a;           /* Temně modrá/černá (velmi luxusní) */
+    --accent-light: #334155;
     
-    /* Stíny pro hloubku (Elevation) */
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --primary: #2563eb;          /* Výrazná modrá pro akce */
+    --primary-gradient: linear-gradient(135deg, #2563eb, #1d4ed8);
     
-    --radius: 12px; /* Konzistentní zaoblení */
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    
+    --border: #e2e8f0;
+    --radius-lg: 24px;           /* Velké zaoblení pro "kartový" vzhled */
+    --radius-sm: 12px;
+    
+    --shadow-soft: 0 10px 40px -10px rgba(0,0,0,0.08);
+    --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
 *, *:before, *:after {
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent; /* Odstraní modré bliknutí na mobilu */
 }
 
 /* ------------------------------------
-   GLOBAL STYLING
+   2. GLOBAL LAYOUT & ANIMATIONS
 ------------------------------------ */
 body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background-color: var(--bg-body);
-    /* Jemný mesh gradient na pozadí pro moderní nádech */
-    background-image: radial-gradient(circle at top left, #e0e7ff, transparent 40%),
-                      radial-gradient(circle at bottom right, #f0fdf4, transparent 40%);
-    background-attachment: fixed;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+    background-color: var(--bg-app);
     margin: 0;
     padding: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
     min-height: 100vh;
-    color: var(--text-main);
-    -webkit-font-smoothing: antialiased;
+    color: var(--text-primary);
+    overflow-x: hidden; /* Zabrání horizontálnímu posunu stránky */
 }
 
-h2, h3 {
-    margin: 0 0 16px 0;
-    font-weight: 700;
-    line-height: 1.2;
+/* Animace pro plynulý nástup */
+@keyframes slideUpFade {
+    0% { opacity: 0; transform: translateY(20px); }
+    100% { opacity: 1; transform: translateY(0); }
 }
 
-/* Přihlašovací stránka - nadpis */
-body > h2 {
-    margin-top: 48px;
-    margin-bottom: 40px;
-    text-align: center;
-    font-size: 2rem;
-    font-weight: 800;
-    color: var(--text-main);
-    letter-spacing: -0.025em; /* Moderní "tight" tracking */
-    text-transform: none; /* Uppercase působí agresivně, normal je čitelnější */
+#content, .login-box {
+    animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 /* ------------------------------------
-   NADPISY NAD TABULKOU
+   3. TYPOGRAPHY & HEADERS
 ------------------------------------ */
+/* Hlavní nadpis stránky (Logo efekt) */
+body > h2 {
+    margin-top: 40px;
+    margin-bottom: 20px;
+    font-size: 1.75rem;
+    font-weight: 800;
+    background: linear-gradient(to right, var(--accent), var(--primary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    letter-spacing: -0.5px;
+    text-align: center;
+    width: 100%;
+}
+
 .table-title {
-    text-align: left; /* Zarovnání doleva je modernější */
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     font-weight: 700;
-    color: var(--text-main);
-    margin: 10px 0 4px 0;
-    letter-spacing: -0.025em;
-    padding-left: 8px;
+    color: var(--accent);
+    margin: 0 0 4px 0;
+    padding: 0 4px;
 }
 
 .table-subtitle {
-    text-align: left;
-    font-size: 0.95rem;
-    color: var(--text-muted);
+    font-size: 0.9rem;
+    color: var(--text-secondary);
     margin-bottom: 24px;
-    padding-left: 8px;
+    padding: 0 4px;
     font-weight: 400;
 }
 
 /* ------------------------------------
-   NAVIGATION BUTTONS
+   4. NAVIGATION (Scrollable on Mobile)
 ------------------------------------ */
 nav {
-    margin: 24px 0 32px 0;
+    width: 100%;
+    max-width: 1000px;
+    margin: 10px 0 30px 0;
+    padding: 0 20px;
+    
+    /* Horizontální skrolování pro mobily */
     display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
     gap: 12px;
-    background: var(--bg-surface);
-    padding: 8px;
-    border-radius: 16px;
-    box-shadow: var(--shadow-sm);
-    border: 1px solid var(--border-color);
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    
+    /* Skrytí scrollbaru */
+    scrollbar-width: none; 
 }
+nav::-webkit-scrollbar { display: none; }
 
 nav button {
-    margin: 0;
+    flex: 0 0 auto; /* Tlačítka se nezmenšují */
     padding: 10px 20px;
-    font-size: 0.95rem;
-    background: transparent;
-    color: var(--text-muted);
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-weight: 500;
-    box-shadow: none;
-}
-
-nav button:hover {
-    background: #f9fafb;
-    color: var(--primary);
-}
-
-/* Aktivní stav (pokud by byl přidán JS) nebo hover efekt */
-nav button:active, nav button:focus {
-    background: #eef2ff;
-    color: var(--primary);
+    font-size: 15px;
     font-weight: 600;
+    border: 1px solid transparent;
+    border-radius: 100px; /* Pill shape */
+    background: var(--surface);
+    color: var(--text-secondary);
+    box-shadow: var(--shadow-card);
+    transition: all 0.2s ease;
+    white-space: nowrap;
 }
 
-/* Odhlásit - decentnější, ale jasné */
-nav button.logout {
-    color: var(--danger);
-    background: #fef2f2;
-    border: 1px solid #fee2e2;
+nav button:hover, nav button:active {
+    transform: scale(0.98);
+    color: var(--primary);
+    background: #eff6ff;
 }
-nav button.logout:hover {
-    background: var(--danger);
-    color: white;
-    transform: none;
-    box-shadow: var(--shadow-sm);
+
+/* Logout button - odlišený */
+nav button.logout {
+    margin-left: auto; /* Na desktopu bude vpravo, na mobilu na konci */
+    background: #fef2f2;
+    color: #ef4444;
 }
 
 /* ------------------------------------
-   CONTENT BOXES
+   5. LOGIN SCREEN (App Style)
+------------------------------------ */
+.login-box {
+    background: var(--surface);
+    width: 90%;
+    max-width: 400px;
+    padding: 40px 30px;
+    margin-top: 20px;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Dekorativní proužek nahoře */
+.login-box::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 6px;
+    background: var(--primary-gradient);
+}
+
+input {
+    width: 100%;
+    padding: 16px;
+    margin: 8px 0 20px 0;
+    border: 2px solid var(--bg-app);
+    border-radius: 16px; /* Moderní kulaté inputy */
+    background: var(--bg-app);
+    font-size: 16px; /* Prevence zoomu na iPhonech */
+    color: var(--text-primary);
+    transition: all 0.3s;
+    appearance: none;
+}
+
+input:focus {
+    outline: none;
+    background: var(--surface);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+}
+
+/* Placeholder styl */
+::placeholder { color: #94a3b8; }
+
+/* Hlavní akční tlačítko */
+button {
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: 16px;
+    background: var(--primary-gradient);
+    color: white;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    transition: transform 0.2s, box-shadow 0.2s;
+    margin-top: 10px;
+}
+
+button:active {
+    transform: scale(0.96);
+}
+
+/* ------------------------------------
+   6. CONTENT & TABLES (Card Style)
 ------------------------------------ */
 .tab {
-    display: none;
-    width: 92%;
-    max-width: 1200px;
-    margin: 0 auto 48px auto;
-    background: transparent; /* Kontejnery jsou nyní transparentní, karty uvnitř */
-    padding: 0;
-    box-shadow: none;
-}
-.tab:target, .tab.active {
-    display: block;
-    animation: fadeIn 0.4s ease;
+    width: 95%;
+    max-width: 1000px;
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    margin-bottom: 40px;
+    box-shadow: var(--shadow-soft);
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-#content {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-}
-
-/* ------------------------------------
-   TABLE STYLING - MODERN CLEAN LOOK
------------------------------------- */
 .table-responsive {
     width: 100%;
     overflow-x: auto;
-    margin-bottom: 32px;
-    background: var(--bg-surface);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow-md);
-    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
 }
 
 table {
     width: 100%;
-    min-width: 700px;
+    min-width: 600px; /* Vynutí skrolování na malých displejích */
     border-collapse: collapse;
-    border-spacing: 0;
-    margin: 0;
-    box-shadow: none;
-    background: var(--bg-surface);
 }
 
-/* Hlavička tabulky - čistá, šedá */
 th {
-    background: #f9fafb;
-    color: var(--text-muted);
-    font-weight: 600;
+    background: #f1f5f9;
+    color: var(--text-secondary);
+    font-size: 12px;
     text-transform: uppercase;
-    font-size: 0.75rem;
-    letter-spacing: 0.05em;
-    padding: 16px 24px;
-    border-bottom: 1px solid var(--border-color);
+    letter-spacing: 1px;
+    font-weight: 600;
+    padding: 16px;
     text-align: left;
-    text-shadow: none;
 }
 
 td {
-    padding: 16px 24px;
-    color: var(--text-main);
-    font-size: 0.95rem;
-    border-bottom: 1px solid var(--border-color);
-    vertical-align: middle;
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    color: var(--text-primary);
 }
 
-tr:last-child td {
-    border-bottom: none;
-}
+tr:last-child td { border-bottom: none; }
 
-tr:hover td {
-    background: #f9fafb;
-}
-
-/* Částky - monospace font pro čísla */
+/* Zvýraznění částek */
 td.amount, .amount {
-    color: var(--success) !important;
+    font-family: 'Menlo', monospace; /* Monospace pro čísla je profi */
     font-weight: 600;
-    font-feature-settings: "tnum";
-    font-variant-numeric: tabular-nums;
+    color: #10b981 !important; /* Emerald green */
 }
 
 /* ------------------------------------
-   LOGIN BOX & FORMS
+   7. SPECIFIC MOBILE OPTIMIZATIONS
+   (Media Queries)
 ------------------------------------ */
-.login-box {
-    background: var(--bg-surface);
-    padding: 48px 40px;
-    border-radius: 16px;
-    box-shadow: var(--shadow-lg);
-    border: 1px solid var(--border-color);
-    text-align: center;
-    width: 100%;
-    max-width: 420px;
-    margin: 0 auto 36px auto;
-}
+@media (max-width: 600px) {
+    body {
+        background-color: var(--surface); /* Na mobilu často vypadá lépe bílé pozadí */
+    }
 
-input {
-    margin: 8px 0 20px 0;
-    padding: 12px 16px;
-    width: 100%;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    outline: none;
-    font-size: 16px;
-    transition: all 0.2s;
-    background: #fff;
-    color: var(--text-main);
-}
-
-input:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-}
-
-button {
-    width: 100%;
-    margin-top: 8px;
-    padding: 12px 24px;
-    border: none;
-    border-radius: 8px;
-    background: var(--primary);
-    color: white;
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: 600;
-    transition: background 0.2s;
-    box-shadow: var(--shadow-sm);
-}
-
-button:hover {
-    background: var(--primary-hover);
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-md);
-}
-
-/* ------------------------------------
-   RESPONSIVE DESIGN
------------------------------------- */
-@media (max-width: 768px) {
-    body { padding: 0 16px; }
-    
     body > h2 {
-        margin-top: 32px;
-        font-size: 1.75rem;
+        margin-top: 20px;
+        font-size: 1.5rem;
+        text-align: left;
+        padding-left: 24px; /* Zarovnání s obsahem */
     }
 
+    /* Login na mobilu přes celou šířku, ale elegantně */
+    .login-box {
+        width: 100%;
+        box-shadow: none; /* Odstraníme stín, splyneme s pozadím */
+        padding: 20px 24px;
+        margin-top: 10px;
+        border-radius: 0;
+    }
+    
+    .login-box input {
+        padding: 18px; /* Větší pro prsty */
+    }
+
+    /* Obsahové karty */
+    .tab {
+        width: 100%;
+        border-radius: 0; /* Na mobilu roztáhnout do krajů */
+        box-shadow: none;
+        padding: 20px 20px 80px 20px; /* Extra padding dole pro komfort */
+    }
+
+    .table-title {
+        font-size: 1.2rem;
+    }
+
+    /* Navigace - přilepená nahoře nebo plynulé skrolování */
     nav {
-        flex-direction: column;
-        width: 100%;
-        padding: 6px;
-    }
-
-    nav button {
-        width: 100%;
-        text-align: center;
-        padding: 12px;
+        padding-left: 20px;
+        padding-right: 20px;
+        margin-bottom: 20px;
     }
     
-    .table-title { font-size: 1.25rem; text-align: center; padding: 0; }
-    .table-subtitle { text-align: center; padding: 0; }
+    /* Tabulka - vizuální nápověda, že jde skrolovat */
+    .table-responsive {
+        box-shadow: inset -10px 0 10px -10px rgba(0,0,0,0.1);
+    }
     
-    th, td { padding: 12px 16px; }
-    
-    .login-box { padding: 32px 24px; }
-}
-
-/* Scrollbar styling */
-::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-}
-::-webkit-scrollbar-track {
-    background: transparent;
-}
-::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
+    th, td {
+        padding: 14px 12px;
+        white-space: nowrap; /* Důležité pro čitelnost na řádku */
+    }
 }
