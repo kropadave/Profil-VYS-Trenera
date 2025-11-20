@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Přihlášení | Portál</title>
-    <!-- Google Fonts: Poppins (Moderní, geometrický) -->
+    <title>Portál | Přihlášení</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="login-page">
 
     <div class="glass-container login-wrapper">
         <div class="login-header">
@@ -16,17 +15,19 @@
             <p>Přihlaste se pro přístup k datům</p>
         </div>
         
+        <!-- Zachována ID pro kompatibilitu s vaším JS -->
         <input type="text" id="username" placeholder="Uživatelské jméno" autocomplete="off">
         <input type="password" id="password" placeholder="Heslo">
         
         <button id="login-btn">
-            <span>Vstoupit do systému</span>
+            <span>Vstoupit</span>
             <div class="arrow">→</div>
         </button>
         
         <p id="error-msg"></p>
     </div>
 
+    <!-- Načítáme vaše původní skripty -->
     <script src="config.js"></script>
     <script src="login.js"></script>
 </body>
