@@ -1,34 +1,49 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portál | Přihlášení</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Přihlášení | Portál</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-<body class="login-page">
-
-    <div class="glass-container login-wrapper">
-        <div class="login-header">
-            <h2>Vítejte</h2>
-            <p>Přihlaste se pro přístup k datům</p>
+<body>
+  
+  <div class="login-container">
+      <h2>Admin Portál</h2>
+      
+      <div class="login-box">
+        <!-- Input pro jméno -->
+        <input type="text" id="username" placeholder="Jméno uživatele" autocomplete="off">
+        
+        <!-- Input pro heslo s ikonou oka -->
+        <div style="position:relative; width:100%;">
+          <input type="password" id="password" placeholder="PIN kód (6 číslic)" maxlength="6" inputmode="numeric" pattern="\d*">
+          <button type="button" id="togglePassword" style="position:absolute; right:10px; top:12px; width:auto; height:auto; background:transparent; border:none; color:var(--text-secondary); font-size:1.2rem; padding:0; margin:0; box-shadow:none;">👁️</button>
         </div>
-        
-        <!-- Zachována ID pro kompatibilitu s vaším JS -->
-        <input type="text" id="username" placeholder="Uživatelské jméno" autocomplete="off">
-        <input type="password" id="password" placeholder="Heslo">
-        
-        <button id="login-btn">
-            <span>Vstoupit</span>
-            <div class="arrow">→</div>
-        </button>
-        
-        <p id="error-msg"></p>
-    </div>
 
-    <!-- Načítáme vaše původní skripty -->
-    <script src="config.js"></script>
-    <script src="login.js"></script>
+        <!-- Tlačítko přihlášení (volá vaši funkci login()) -->
+        <button onclick="login()">Vstoupit do systému</button>
+        
+        <!-- Chybová hláška -->
+        <p id="error" class="login-error"></p>
+      </div>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="login.js"></script>
+  
+  <script>
+    // Vaše původní logika pro přepínání hesla
+    document.getElementById('togglePassword').onclick = function() {
+      const pwd = document.getElementById('password');
+      if (pwd.type === 'password') {
+        pwd.type = 'text';
+        this.textContent = '🙈';
+      } else {
+        pwd.type = 'password';
+        this.textContent = '👁️';
+      }
+    };
+  </script>
 </body>
 </html>
