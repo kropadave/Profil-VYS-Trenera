@@ -297,6 +297,19 @@ h3 {
 .table-wrapper {
   margin-top: 8px;
   overflow-x: auto;
+  position: relative;
+}
+
+/* malý gradientový stín vpravo – naznačuje scroll */
+.table-wrapper::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 18px;
+  height: 100%;
+  pointer-events: none;
+  background: linear-gradient(to left, rgba(15,23,42,1), transparent);
 }
 
 table {
@@ -352,6 +365,81 @@ tbody tr:hover td {
   color: #facc15;
 }
 
+/* ---------------- FILTER ROW (DOCHÁZKA) ---------------- */
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: flex-end;
+  margin-bottom: 12px;
+}
+
+.filter-field {
+  display: flex;
+  flex-direction: column;
+  min-width: 140px;
+  flex: 1 1 140px;
+}
+
+.filter-field label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.filter-field input[type="date"] {
+  padding: 6px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(148,163,184,0.4);
+  background: rgba(15,23,42,0.9);
+  color: var(--text-main);
+  font-size: 0.8rem;
+  outline: none;
+}
+
+.filter-field input[type="date"]:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent-soft);
+}
+
+.filter-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+
+.secondary-btn,
+.ghost-btn {
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  border: 1px solid transparent;
+  background: none;
+  color: var(--text-main);
+}
+
+.secondary-btn {
+  background: rgba(37,99,235,0.9);
+  border-color: rgba(37,99,235,1);
+}
+
+.secondary-btn:hover {
+  filter: brightness(1.05);
+}
+
+.ghost-btn {
+  border-color: rgba(148,163,184,0.6);
+  color: var(--text-muted);
+}
+
+.ghost-btn:hover {
+  border-color: var(--accent);
+  color: var(--text-main);
+}
+
 /* ---------------- RESPONSIVE ---------------- */
 @media (max-width: 640px) {
   .login-box {
@@ -367,5 +455,26 @@ tbody tr:hover td {
   }
   table {
     min-width: 360px;
+    font-size: 0.8rem;
+  }
+  th, td {
+    padding: 8px 6px;
+  }
+  .filter-row {
+    gap: 8px;
+  }
+  .filter-buttons {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 420px) {
+  table {
+    min-width: 320px;
+    font-size: 0.78rem;
+  }
+  th, td {
+    padding: 6px 4px;
   }
 }
